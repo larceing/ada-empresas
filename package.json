@@ -1,0 +1,11 @@
+{
+  "name": "ada-empresas",
+  "private": true,
+  "type": "module",
+  "description": "Familia Ada: la oficina base (recepción, gestión, supervisión, registro, seguimiento, incidencias) y sus oficinas. Node >= 22 sin dependencias.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test",
+    "banco": "node banco/generar.js && node banco/probar.js"
+  }
+}
