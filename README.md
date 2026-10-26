@@ -42,7 +42,7 @@ Un módulo nuevo no es un programa nuevo: es una plantilla con `nombre`, `clasif
 ## Probar
 
 ```
-npm test                  # 15 pruebas (incluida la cadena Comercial → Pedidos → Producción → Planta)
+npm test                  # 16 pruebas (incluida la cadena Comercial → Pedidos → Producción → Planta)
 node banco/generar.js     # crea banco/correos/*.eml
 node banco/probar.js      # pasa el banco por la oficina de Pedidos y enseña el resultado
 ```
@@ -54,3 +54,7 @@ Para leer PDF hace falta `pdftotext` (poppler) y, para escaneados, `pdftoppm` + 
 - La API de OpenAI solo para texto. Nunca imágenes.
 - Ninguna clave en el repo. Datos de clientes solo en `/datos` del servidor.
 - Nada se registra sin Supervisión salvo el piloto automático, que se activa por cliente.
+
+## Dónde se ve
+
+El laboratorio de Arce Data Lab (`/lab/#sindri`) monta cuatro oficinas con este núcleo: Comercial, Pedidos, Producción y Planta y almacén. Copia el núcleo en `src/p/ada-base/` del laboratorio (repo `larceing/demos`, carpeta `laboratorio`); si cambias `src/nucleo`, cópialo allí y reconstruye.
