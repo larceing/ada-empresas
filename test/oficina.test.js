@@ -33,6 +33,11 @@ test('líneas de un PDF con columnas apretadas', () => {
   assert.deepEqual(l.map((x) => [x.ref, x.cantidad, x.precio]), [['TOR-M6-30', 500, 0.08], ['ARA-M6', 1000, null]]);
 });
 
+test('una descripción que acaba en número no se confunde con la cantidad', () => {
+  const l = pedido.lineasDe('BAR-120     Barandilla 120             6\nBAS-60     Bastidor 60             8     35,00\nNOV-BS60\tBastidor cajonera 60\t40');
+  assert.deepEqual(l.map((x) => [x.ref, x.descripcion, x.cantidad, x.precio]), [['BAR-120', 'Barandilla 120', 6, null], ['BAS-60', 'Bastidor 60', 8, 35], ['NOV-BS60', 'Bastidor cajonera 60', 40, null]]);
+});
+
 test('el correo .eml se lee con su adjunto', () => {
   const e = correo('02');
   assert.equal(e.de, 'pedidos@ferreteria-sol.test');

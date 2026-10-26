@@ -13,11 +13,11 @@ export function desdeEvento(_evento, d) {
 }
 export const estadosSeguimiento = ['confirmado', 'en_produccion', 'servido'];
 export const puestos = {
-  recepcion: { tarea: 'Lee el correo y sus adjuntos y decide si es un pedido' },
-  gestion: { tarea: 'Saca cliente, número, entrega y líneas, y las cruza con el catálogo' },
-  supervision: { tarea: 'Aprueba, corrige referencias o descarta' },
-  registro: { tarea: 'Da de alta el pedido en el ERP' },
-  seguimiento: { tarea: 'Confirmación al cliente, producción y entrega' },
+  recepcion: { nombre: 'Buzón de pedidos', tarea: 'Lee el correo y sus adjuntos y decide si es un pedido' },
+  gestion: { nombre: 'Gestión de pedidos', tarea: 'Saca cliente, número, entrega y líneas, y las cruza con el catálogo' },
+  supervision: { nombre: 'Responsable de pedidos', tarea: 'Aprueba, corrige referencias o descarta' },
+  registro: { nombre: 'Alta en el ERP', tarea: 'Da de alta el pedido en el ERP' },
+  seguimiento: { nombre: 'Atención al cliente', tarea: 'Confirmación al cliente, producción y entrega' },
 };
 
 // ---------- números en formato español ----------
@@ -62,23 +62,35 @@ export function clasificar(e) {
 const esRef = (t) => /^[A-Z0-9][A-Z0-9._/-]{2,}$/i.test(t) && /\d/.test(t) && /[A-Z]/i.test(t);
 
 // Una línea de pedido: referencia al principio (o tras un nº de línea), números al final (cantidad y, si hay, precio).
-// Funciona con columnas bien separadas (Excel, correo) y con el texto apretado que sale de muchos PDF.
+// Primero se miran las columnas (tabulador, «;» o varios espacios), que es lo que dan Excel y la mayoría de correos;
+// si no hay columnas claras (texto apretado de algunos PDF), se mira palabra a palabra.
 const esNum = (t) => numero(t) !== null;
+const limpiar = (l) => l.filter((x) => x && !/^(uds?\.?|unidades|eur|€)$/i.test(x));
+
+function deTrozos(t) {
+  if (t.length < 2) return null;
+  // La referencia puede venir pegada a la descripción en la primera columna («TOR-M6-30 Tornillo M6x30»)
+  let iRef = esRef(t[0]) ? 0 : (esNum(t[0]) && t[1] && esRef(t[1]) ? 1 : -1);
+  if (iRef < 0) {
+    const pal = t[0].split(/\s+/);
+    if (pal.length > 1 && esRef(pal[0])) { t = [pal[0], pal.slice(1).join(' '), ...t.slice(1)]; iRef = 0; } else return null;
+  }
+  let fin = t.length;
+  while (fin > iRef + 1 && esNum(t[fin - 1])) fin -= 1;
+  const nums = t.slice(fin).map(numero);
+  if (!nums.length) return null;
+  const cantidad = nums[0];
+  if (cantidad <= 0 || cantidad > 1e7) return null;
+  const precio = nums.length > 1 && /[,.]\d{1,4}$/.test(t[fin + 1]) ? nums[1] : null;
+  return { ref: t[iRef].toUpperCase(), descripcion: t.slice(iRef + 1, fin).join(' '), cantidad, precio };
+}
+
 export function lineasDe(texto) {
   const lineas = [];
   for (const fila of String(texto).split(/\r?\n/)) {
-    const t = fila.replace(/€/g, ' ').split(/[\s;|]+/).filter((x) => x && !/^(uds?\.?|unidades|eur)$/i.test(x));
-    if (t.length < 2) continue;
-    const iRef = esRef(t[0]) ? 0 : (esNum(t[0]) && t[1] && esRef(t[1]) ? 1 : -1);
-    if (iRef < 0) continue;
-    let fin = t.length;
-    while (fin > iRef + 1 && esNum(t[fin - 1])) fin -= 1;
-    const nums = t.slice(fin).map(numero);
-    if (!nums.length) continue;
-    const cantidad = nums[0];
-    if (cantidad <= 0 || cantidad > 1e7) continue;
-    const precio = nums.length > 1 && /[,.]\d{1,4}$/.test(t[fin + 1]) ? nums[1] : null;
-    lineas.push({ ref: t[iRef].toUpperCase(), descripcion: t.slice(iRef + 1, fin).join(' '), cantidad, precio });
+    const cols = limpiar(fila.replace(/€/g, ' ').split(/\t|;|\s{2,}|\s\|\s/).map((x) => x.trim()));
+    const l = (cols.length >= 2 && deTrozos(cols)) || deTrozos(limpiar(fila.replace(/€/g, ' ').split(/[\s;|]+/)));
+    if (l) lineas.push(l);
   }
   return lineas;
 }

@@ -44,4 +44,4 @@ export async function corregir(exp, cambios) {
 }
 
 export const resumir = (d) => `${d.fabricar.reduce((n, f) => n + f.cantidad, 0)} piezas · ${d.fases.length} fases`;
-export const titulo = (exp) => `Fabricación · ${exp.entrada.asunto}`;
+export const titulo = (exp) => `Fabricar ${String(exp.entrada.asunto).replace(/^Orden del /, '')}`;

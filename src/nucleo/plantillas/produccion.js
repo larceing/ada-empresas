@@ -5,11 +5,11 @@ export const nombre = 'orden';
 export const escucha = 'pedidos.registrado';
 export const estadosSeguimiento = ['lanzada', 'en_planta', 'terminada'];
 export const puestos = {
-  recepcion: { tarea: 'Recoge los pedidos registrados' },
-  gestion: { tarea: 'Mira el stock y separa lo que se sirve de lo que se fabrica' },
-  supervision: { tarea: 'El jefe de producción aprueba las órdenes' },
-  registro: { tarea: 'Lanza las órdenes de fabricación' },
-  seguimiento: { tarea: 'Sigue las órdenes en planta' },
+  recepcion: { nombre: 'Recepción de pedidos', tarea: 'Recoge los pedidos registrados' },
+  gestion: { nombre: 'Planificación', tarea: 'Mira el stock y separa lo que se sirve de lo que se fabrica' },
+  supervision: { nombre: 'Jefe de producción', tarea: 'El jefe de producción aprueba las órdenes' },
+  registro: { nombre: 'Lanzamiento', tarea: 'Lanza las órdenes de fabricación' },
+  seguimiento: { nombre: 'Seguimiento de órdenes', tarea: 'Sigue las órdenes en planta' },
 };
 
 export function desdeEvento(_evento, d) {
@@ -46,4 +46,4 @@ export async function validar(datos, c) {
 }
 
 export const resumir = (d) => `${d.fabricar.length} a fabricar · ${d.servir.length} del almacén`;
-export const titulo = (exp) => `Orden · ${exp.entrada.asunto}`;
+export const titulo = (exp) => `Orden del ${String(exp.entrada.asunto).replace(/^Pedido /, "pedido ")}`;
