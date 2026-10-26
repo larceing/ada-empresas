@@ -2,6 +2,15 @@
 // Las reglas resuelven lo habitual sin gastar; la IA solo entra cuando las reglas no bastan.
 
 export const nombre = 'pedido';
+// Si hay oficina Comercial, lo que gana el comercial entra aquí como pedido ya ordenado.
+export const escucha = 'comercial.registrado';
+export function desdeEvento(_evento, d) {
+  return {
+    canal: 'Brokkr', de: 'Oficina Comercial', asunto: `Oportunidad ganada · ${d.titulo}`,
+    cliente_id: d.cliente ? d.cliente.id : null,
+    estructurado: { numero_pedido: `OP-${String(d.id).slice(0, 6).toUpperCase()}`, lineas: d.datos.lineas.map((l) => ({ ref: l.producto, descripcion: '', cantidad: l.cantidad, precio: l.precio ?? null, producto: l.producto })) },
+  };
+}
 export const estadosSeguimiento = ['confirmado', 'en_produccion', 'servido'];
 export const puestos = {
   recepcion: { tarea: 'Lee el correo y sus adjuntos y decide si es un pedido' },

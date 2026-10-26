@@ -24,7 +24,7 @@ src/nucleo/        Igual en el servidor y en el navegador (laboratorio). Sin nad
   oficina.js       Los seis puestos, aprobar, descartar, recuperar, reintentar, seguir, tablero
   bus.js           El pasillo entre oficinas
   memoria.js       Almacén en memoria (laboratorio y pruebas)
-  plantillas/      Qué es un caso en cada oficina: pedido.js (Pedidos), produccion.js (Producción)
+  plantillas/      Qué es un caso en cada oficina: comercial.js, pedido.js, produccion.js, planta.js
 src/node/          Lo que solo existe en el servidor
   correo.js        Leer .eml (MIME, base64, quoted-printable, adjuntos)
   extraer.js       Texto de adjuntos: PDF (pdftotext), escaneado (OCR con tesseract), Excel, CSV
@@ -42,7 +42,7 @@ Un módulo nuevo no es un programa nuevo: es una plantilla con `nombre`, `clasif
 ## Probar
 
 ```
-npm test                  # 14 pruebas
+npm test                  # 15 pruebas (incluida la cadena Comercial → Pedidos → Producción → Planta)
 node banco/generar.js     # crea banco/correos/*.eml
 node banco/probar.js      # pasa el banco por la oficina de Pedidos y enseña el resultado
 ```
