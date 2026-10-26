@@ -57,4 +57,4 @@ Para leer PDF hace falta `pdftotext` (poppler) y, para escaneados, `pdftoppm` + 
 
 ## Dónde se ve
 
-El laboratorio de Arce Data Lab (`/lab/#sindri`) monta cuatro oficinas con este núcleo: Comercial, Pedidos, Producción y Planta y almacén. Copia el núcleo en `src/p/ada-base/` del laboratorio (repo `larceing/demos`, carpeta `laboratorio`); si cambias `src/nucleo`, cópialo allí y reconstruye.
+El laboratorio de Arce Data Lab (`/lab/#sindri`) monta cuatro oficinas con este núcleo: Comercial, Pedidos, Producción y Planta y almacén. Copia el núcleo en `src/p/ada-base/` del laboratorio (`DESARROLLO\demos\laboratorio` en el PC; se publica en `larceing/web-portafolio`, carpeta `lab/`); si cambias `src/nucleo`, cópialo allí y reconstruye.
