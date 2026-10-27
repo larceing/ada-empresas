@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ada · infra (ejemplo)</title>
+<link rel="icon" href="icono.svg" type="image/svg+xml">
+<link rel="stylesheet" href="ejemplo.css">
+<link rel="stylesheet" href="mundo.css">
+<script src="mundo.js" defer></script>
+<script src="infra.js" defer></script>
+<script src="ejemplo.js" defer></script>
+</head>
+<body>
+<header class="barra">
+  <div class="marca">
+    <span class="marca-ada" aria-hidden="true"><i></i><i></i></span>
+    <div><strong>Ada</strong><small>vigila la infra</small></div>
+  </div>
+  <span class="chip dev">Datos de ejemplo</span>
+  <label class="simular"><input type="checkbox" id="simular" checked> Simular cambios</label>
+</header>
+<main class="escena">
+  <section class="oficina" aria-label="La oficina de infra">
+    <div class="kpis" id="kpis"></div>
+    <div id="mundo"></div>
+  </section>
+  <aside class="lateral" id="lateral" aria-live="polite"></aside>
+</main>
+<noscript>Este ejemplo necesita JavaScript.</noscript>
+</body>
+</html>
