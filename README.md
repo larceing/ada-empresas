@@ -1,6 +1,6 @@
 # Familia Ada · Ada base
 
-Oficinas online para pymes (ada-office, ada-commercial, ada-customer-service, ada-ti, ada-bi, ada-fábrica). Este repo tiene el **Ada base**: la oficina común que usan todas, y las plantillas de cada oficina. Node ≥ 22, sin dependencias.
+Oficinas online para pymes (ada-office, ada-commercial, ada-customer-service, ada-ti, ada-bi, ada-fábrica, ada-infra). Este repo tiene el **Ada base**: la oficina común que usan todas, y las plantillas de cada oficina. Node ≥ 22, sin dependencias.
 
 El Ada del canal y la captación (`larceing/ada`) es otro sistema y no se toca desde aquí.
 
@@ -31,6 +31,8 @@ src/node/          Lo que solo existe en el servidor
   ia.js            API de OpenAI, solo texto, con tope de gasto por espacio
   almacen.js       Ficheros en /datos/<espacio>/<oficina>/ (se cambiará por PostgreSQL)
   webhooks.js      Eventos hacia fuera, firmados con HMAC
+visual/            La oficina isométrica de los vídeos para copiar a otro sistema, y ada-infra (BD, ejecuciones,
+                   controles, unidades de red, copias, servidores). Ver visual/LEEME.md
 banco/             Banco de pruebas: correos inventados con y sin adjuntos
 test/              node --test
 ```
