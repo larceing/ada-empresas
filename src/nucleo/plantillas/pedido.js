@@ -1,5 +1,6 @@
 // Plantilla «pedido» (Ada Pedidos, de ada-office): qué es un pedido, qué datos sacar y qué comprobar.
 // Las reglas resuelven lo habitual sin gastar; la IA solo entra cuando las reglas no bastan.
+import { buscarParecido } from '../similitud.js';
 
 export const nombre = 'pedido';
 // Si hay oficina Comercial, lo que gana el comercial entra aquí como pedido ya ordenado.
@@ -153,13 +154,29 @@ export async function validar(datos, c, { aceptados = [] } = {}) {
   if (!datos.numero_pedido) avisos.push({ tipo: 'numero', texto: 'Falta el número de pedido del cliente' });
   if (!datos.lineas.length) avisos.push({ tipo: 'lineas', texto: 'No hay líneas de pedido' });
   const catalogo = c.config.catalogo || [];
+  // Cruce aproximado: «proponer» desde esta puntuación; «auto» (null por defecto) da por bueno el parecido sin persona.
+  const cruce = { proponer: 0.6, auto: null, ...(c.config.cruce || {}) };
   const lineas = [];
   for (const l of datos.lineas) {
+    const { propuesta: _p, ...base } = l;
     let producto = l.producto && catalogo.some((p) => p.ref === l.producto) ? l.producto : null;
-    if (!producto && cliente) producto = await c.equivalencia(cliente.id, l.ref);
-    if (!producto) { const p = catalogo.find((x) => x.ref.toUpperCase() === l.ref); if (p) producto = p.ref; }
-    if (!producto && !aceptados.includes(l.ref)) avisos.push({ tipo: 'referencia', ref: l.ref, texto: `¿Qué producto es ${l.ref}?` });
-    lineas.push({ ...l, producto });
+    let como = producto ? (l.cruce || 'dado') : null;
+    let confianza = producto ? (l.confianza ?? 1) : 0;
+    if (!producto && cliente) { producto = await c.equivalencia(cliente.id, l.ref); if (producto) { como = 'aprendido'; confianza = 1; } }
+    if (!producto) { const p = catalogo.find((x) => x.ref.toUpperCase() === l.ref); if (p) { producto = p.ref; como = 'exacto'; confianza = 1; } }
+    let propuesta = null;
+    if (!producto && !aceptados.includes(l.ref)) {
+      const p = buscarParecido(l, catalogo);
+      if (p && cruce.auto && p.puntuacion >= cruce.auto && p.puntuacion - p.segundo >= 0.05) {
+        producto = p.ref; como = 'parecido'; confianza = p.puntuacion;
+      } else if (p && p.puntuacion >= cruce.proponer) {
+        propuesta = { ref: p.ref, nombre: p.nombre, puntuacion: p.puntuacion, por: p.por };
+        avisos.push({ tipo: 'referencia', ref: l.ref, propuesta: p.ref, puntuacion: p.puntuacion, texto: `¿${l.ref} es ${p.ref}${p.nombre ? ` (${p.nombre})` : ''}? Se parece un ${Math.round(p.puntuacion * 100)} %` });
+      } else {
+        avisos.push({ tipo: 'referencia', ref: l.ref, texto: `¿Qué producto es ${l.ref}?` });
+      }
+    }
+    lineas.push({ ...base, producto, cruce: como, confianza, ...(propuesta ? { propuesta } : {}) });
   }
   if (cliente && datos.numero_pedido) {
     const dup = await c.existe((e) => e.id !== c.exp.id && e.tipo === 'pedido' && e.estado === 'registrado' && e.cliente && e.cliente.id === cliente.id && e.datos && e.datos.numero_pedido === datos.numero_pedido);
@@ -169,9 +186,11 @@ export async function validar(datos, c, { aceptados = [] } = {}) {
 }
 
 // ---------- Supervisión: corregir y aprender ----------
-// cambios: { numero_pedido?, fecha_entrega?, direccion_entrega?, productos?: { [refCliente]: producto } }
+// cambios: { numero_pedido?, fecha_entrega?, direccion_entrega?, productos?: { [refCliente]: producto }, aceptar_propuestas?: true }
+// aceptar_propuestas: la persona da por buenas todas las propuestas del cruce aproximado (un clic).
 export async function corregir(exp, cambios, c) {
-  const productos = cambios.productos || {};
+  const productos = { ...(cambios.productos || {}) };
+  if (cambios.aceptar_propuestas) for (const l of exp.datos.lineas) if (l.propuesta && !productos[l.ref]) productos[l.ref] = l.propuesta.ref;
   const catalogo = c.config.catalogo || [];
   for (const [ref, prod] of Object.entries(productos)) {
     if (!catalogo.some((p) => p.ref === prod)) throw Object.assign(new Error(`El producto ${prod} no está en el catálogo`), { codigo: 400 });
@@ -179,7 +198,7 @@ export async function corregir(exp, cambios, c) {
   }
   const datos = { ...exp.datos };
   for (const k of ['numero_pedido', 'fecha_entrega', 'direccion_entrega']) if (cambios[k] !== undefined) datos[k] = cambios[k];
-  datos.lineas = exp.datos.lineas.map((l) => (productos[l.ref] ? { ...l, producto: productos[l.ref] } : l));
+  datos.lineas = exp.datos.lineas.map((l) => { if (!productos[l.ref]) return l; const { propuesta: _p, ...r } = l; return { ...r, producto: productos[l.ref], cruce: 'persona', confianza: 1 }; });
   return { datos };
 }
 

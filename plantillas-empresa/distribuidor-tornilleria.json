@@ -1,0 +1,49 @@
+{
+  "nombre": "Oficina de pedidos de un distribuidor (empresa demo del banco)",
+  "tipo": "oficina-pedidos",
+  "fecha": "2026-11-22",
+  "autor": "Dafne",
+  "descripcion": "Un año de pedidos por correo a la Empresa demo (clientes y catálogo del banco de pruebas). Compara una persona tecleando cada pedido con la oficina de Ada y una persona que solo supervisa.",
+  "espacio": {
+    "clientes": [
+      { "id": "levante", "nombre": "Distribuciones Levante SL", "dominios": ["distribuciones-levante.test"] },
+      { "id": "sol", "nombre": "Ferretería Sol SL", "dominios": ["ferreteria-sol.test"] },
+      { "id": "noray", "nombre": "Talleres Noray SL", "dominios": ["talleres-noray.test"] },
+      { "id": "elda", "nombre": "Montajes Elda SL", "dominios": ["montajes-elda.test"] },
+      { "id": "vega", "nombre": "Suministros Vega Baja SL", "dominios": ["suministros-vega.test"] },
+      { "id": "marina", "nombre": "Carpintería Marina SL", "dominios": ["carpinteria-marina.test"] }
+    ],
+    "catalogo": [
+      { "ref": "TOR-M8-40", "nombre": "Tornillo M8x40 zincado" }, { "ref": "ARA-M8", "nombre": "Arandela M8" },
+      { "ref": "TOR-M6-30", "nombre": "Tornillo M6x30" }, { "ref": "TUE-M6", "nombre": "Tuerca M6" }, { "ref": "ARA-M6", "nombre": "Arandela M6" },
+      { "ref": "BIS-80", "nombre": "Bisagra acero 80 mm" }, { "ref": "BIS-100", "nombre": "Bisagra acero 100 mm" },
+      { "ref": "TAC-8", "nombre": "Taco nailon 8 mm" }, { "ref": "TAC-10", "nombre": "Taco nailon 10 mm" },
+      { "ref": "ESC-40", "nombre": "Escuadra reforzada 40 mm" }, { "ref": "PAS-120", "nombre": "Pasador cerrojo 120 mm" },
+      { "ref": "TIR-160", "nombre": "Tirador inox 160 mm" }
+    ]
+  },
+  "simulacion": {
+    "oficina": {
+      "pedidos_dia_laborable": { "min": 15, "probable": 25, "max": 40, "fuente": "supuesto (pyme distribuidora)" },
+      "formatos": { "texto": 0.35, "pdf": 0.4, "excel": 0.15, "escaneado": 0.1 },
+      "lineas_por_pedido": { "min": 1, "probable": 3, "max": 12, "fuente": "supuesto" },
+      "p_ref_propia": 0.3, "p_errata": 0.04, "p_ref_desconocida": 0.01, "p_sin_numero": 0.05, "p_duplicado": 0.02, "p_remitente_nuevo": 0.02
+    },
+    "personas": {
+      "personas": 1,
+      "jornada": { "inicio": 8, "fin": 15, "dias": [1, 2, 3, 4, 5] },
+      "ausencia_dia": 0.04,
+      "teclear_min": { "mediana": 3, "sigma": 0.4, "fuente": "supuesto: abrir el correo y la cabecera del pedido en el ERP" },
+      "teclear_linea_min": { "mediana": 0.7, "sigma": 0.4, "fuente": "supuesto" },
+      "error_linea_manual": { "min": 0.01, "probable": 0.02, "max": 0.03, "fuente": "APQC: 1–3 % de errores en la entrada manual de pedidos (citado por Elentaria)" },
+      "revisar_min": { "mediana": 0.8, "sigma": 0.4, "fuente": "supuesto: mirar un pedido ya leído y dar el OK" },
+      "aviso_min": { "mediana": 1.2, "sigma": 0.5, "fuente": "supuesto" },
+      "propuesta_min": { "mediana": 0.2, "sigma": 0.4, "fuente": "supuesto: aceptar una propuesta del cruce" },
+      "alta_cliente_min": { "mediana": 6, "sigma": 0.4, "fuente": "supuesto" },
+      "interrupcion": 0.2,
+      "error_supervision": 0.003,
+      "coste_hora_eur": 18
+    },
+    "ada": { "piloto_tras": 8, "cruce_auto": null }
+  }
+}
