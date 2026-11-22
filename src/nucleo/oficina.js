@@ -9,6 +9,9 @@
 //   Seguimiento  lleva los estados posteriores (confirmado, servido…) y vigila lo atascado.
 //   Incidencias  cualquier fallo en un puesto acaba aquí con su tipo y se puede reintentar desde ese puesto.
 
+import { resumenMetricas, contarCambios } from './metricas.js';
+import { procesoDe } from './proceso.js';
+
 export const PUESTOS = [
   { id: 'recepcion', nombre: 'Recepción', quien: 'regla' },
   { id: 'gestion', nombre: 'Gestión', quien: 'regla+ia' },
@@ -221,13 +224,15 @@ export function crearOficina(o) {
       }
       const corregido = plantilla.corregir ? await plantilla.corregir(exp, cambios, c) : { datos: exp.datos };
       const v = await plantilla.validar(corregido.datos, c, { aceptados: corregido.aceptados || [] });
+      const cambiados = contarCambios(exp.datos, v.datos);
+      exp.correcciones = (exp.correcciones || 0) + cambiados;
       exp.datos = v.datos;
       exp.avisos = v.avisos;
       if (exp.avisos.length) {
         anotar(exp, 'supervision', 'corregido', `Quedan ${exp.avisos.length} avisos`, quien);
         return guardar(exp);
       }
-      anotar(exp, 'supervision', 'aprobado', null, quien);
+      anotar(exp, 'supervision', 'aprobado', cambiados ? `${cambiados} cambios` : null, quien);
       return avanzar(exp, 'registro');
     },
 
@@ -291,6 +296,12 @@ export function crearOficina(o) {
       }
       return t;
     },
+
+    /** Cuánto pasa solo, cuánto corrige la persona y cuánto se tarda (ver metricas.js). */
+    async metricas() { return resumenMetricas(await almacen.listar()); },
+
+    /** Tiempos y colas por puesto, y por dónde va el trabajo (ver proceso.js). */
+    async proceso() { return procesoDe(await almacen.listar(), { ahora: reloj(), nombres: Object.fromEntries(puestos.map((p) => [p.id, p.nombre])) }); },
 
     listar: () => almacen.listar(),
     obtener: (expId) => obtener(expId),

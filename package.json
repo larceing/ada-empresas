@@ -6,6 +6,8 @@
   "engines": { "node": ">=22" },
   "scripts": {
     "test": "node --test",
-    "banco": "node banco/generar.js && node banco/probar.js"
+    "banco": "node banco/generar.js && node banco/probar.js",
+    "simular": "node src/simulacion/cli.js oficina plantillas-empresa/distribuidor-tornilleria.json",
+    "empresa": "node src/simulacion/cli.js empresa plantillas-empresa/importacion-motos.json"
   }
 }
